@@ -1,2 +1,2 @@
 # dialogues
-Comprehension exercises fro our Hungarize dialogues,
+Comprehension exercises for our Hungarize dialogues.
