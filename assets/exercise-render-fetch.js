@@ -3,16 +3,25 @@
  * Loaded only by the shared engine page (comprehension.html at the repo
  * root). Reads the ?dialogue=<slug> query parameter, fetches
  * data/<slug>.json (same origin, relative to the engine page), and builds
- * the exact same DOM structure as assets/exercise-render.js (the v3
- * inline-JSON renderer) - same classes, same data-id ordering, same
- * info-button contract - so assets/exercise-style.css and
- * assets/exercise-script.js work completely unmodified.
+ * the whole exercise DOM in the browser.
  *
- * exercise-script.js is deliberately never included as a static <script>
- * tag on the engine page: this file injects it only AFTER the fetched
- * exercise has finished rendering, so its answer-checking and self-check
- * logic always finds a populated DOM. This keeps exercise-script.js itself
- * untouched - no shared, retroactive asset is modified by this version.
+ * This file owns the DOM contract that assets/exercise-style.css and
+ * assets/exercise-script.js both depend on: the classes answer-input,
+ * answer-select, answer-wrapper, info-btn, dialogue-line, word-item and
+ * word-term, the form id exerciseForm, the mount point #exercise-root, and a
+ * global `answers` object keyed by the data-id values assigned here in
+ * document order. Renaming any of those means updating the stylesheet and the
+ * runtime script in the same change.
+ *
+ * exercise-script.js is deliberately never included as a static <script> tag
+ * on the engine page: this file injects it only AFTER the fetched exercise has
+ * finished rendering, so its answer-checking and self-check logic always finds
+ * a populated DOM.
+ *
+ * Answer fields are intentionally NOT length-capped. An earlier version set
+ * maxLength on them, which silently made any answer longer than the cap
+ * impossible to type - a real hazard in Hungarian, where kajszibarack (12
+ * characters) and szovegertes (11) are ordinary words.
  */
 (function () {
 	var root = document.getElementById("exercise-root")
@@ -73,7 +82,7 @@
 		var answers = {}
 		var nextId = 1
 
-		function field(kind, answerList, display, maxlength) {
+		function field(kind, answerList, display) {
 			var id = String(nextId++)
 			answers[id] = answerList
 			var wrap = h("div", "answer-wrapper")
@@ -89,7 +98,6 @@
 			} else {
 				input = h("input", "answer-input")
 				input.type = "text"
-				input.maxLength = maxlength
 				input.placeholder = "..."
 			}
 			input.setAttribute("data-id", id)
@@ -101,10 +109,10 @@
 			return wrap
 		}
 
-		function appendMarked(row, str, maxlength, plainClass) {
+		function appendMarked(row, str, plainClass) {
 			String(str).split(/\[\[(.+?)\]\]/).forEach(function (part, i) {
 				if (i % 2 === 1) {
-					row.appendChild(field("input", variants(part), part, maxlength))
+					row.appendChild(field("input", variants(part), part))
 				} else if (part) {
 					row.appendChild(plainClass ? h("span", plainClass, part) : text(part))
 				}
@@ -147,7 +155,7 @@
 			var row = h("div", "dialogue-line")
 			row.appendChild(h("span", "dialogue-dash", "-"))
 			row.appendChild(text(" "))
-			appendMarked(row, line, 10, null)
+			appendMarked(row, line, null)
 			dlgSection.appendChild(row)
 		})
 		form.appendChild(dlgSection)
@@ -158,7 +166,7 @@
 			var term = String(w.term)
 			if (w.blank) {
 				var marked = /\[\[.+?\]\]/.test(term) ? term : "[[" + term + "]]"
-				appendMarked(row, marked, 15, "word-term")
+				appendMarked(row, marked, "word-term")
 				row.appendChild(text(" = " + w.gloss))
 			} else {
 				row.appendChild(h("span", "word-term", term.replace(/\[\[|\]\]/g, "")))
