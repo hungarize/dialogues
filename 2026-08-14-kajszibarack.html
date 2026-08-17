@@ -5,261 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>kajszibarack - Hungarize Exercise</title>
 
-    <!-- IMPORTANT: Google Fonts - Lexend is used throughout for modern, clean typography -->
+    <!-- Lexend is the Hungarize brand typeface -->
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* ===== COLOUR SCHEME (DO NOT CHANGE) =====
-           Primary Brand Colour: #E57F54 (used for buttons, dividers, info circles)
-           Background: #F9CD8C (warm beige)
-           Correct Answer: #90EE90 (bright green) with border #00CC00
-           Incorrect Answer: #FFB3B3 (bright red) with border #FF0000
-           These colours are specifically chosen for accessibility (colourblind-friendly)
-        ===== END COLOUR SCHEME ===== */
-
-        body {
-            font-family: 'Lexend', sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #F9CD8C;
-            line-height: 1.6;
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo img {
-            display: block;
-            margin: 0 auto;
-        }
-
-        .title {
-            font-family: 'Lexend', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        .section-title {
-            font-family: 'Lexend', sans-serif;
-            font-size: 18px;
-            font-weight: 600;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            color: #333;
-            border-bottom: 2px solid #E57F54;
-            padding-bottom: 8px;
-        }
-
-        .section {
-            margin-bottom: 30px;
-        }
-
-        .statement {
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-
-        .statement-num {
-            font-weight: bold;
-            color: #666;
-        }
-
-        .answer-input {
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            min-width: 80px;
-            transition: all 0.3s ease;
-        }
-
-        .answer-input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-        }
-
-        .answer-input.correct {
-            background-color: #90EE90;
-            border-color: #00CC00;
-            color: #004D00;
-        }
-
-        .answer-input.incorrect {
-            background-color: #FFB3B3;
-            border-color: #FF0000;
-            color: #660000;
-        }
-
-        .answer-select {
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            background-color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .answer-select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-        }
-
-        .answer-select.correct {
-            background-color: #90EE90;
-            border-color: #00CC00;
-            color: #004D00;
-        }
-
-        .answer-select.incorrect {
-            background-color: #FFB3B3;
-            border-color: #FF0000;
-            color: #660000;
-        }
-
-        .answer-wrapper {
-            display: inline-flex !important;
-            flex-direction: row !important;
-            align-items: center;
-            gap: 8px;
-            margin-right: 5px;
-        }
-
-        .info-btn {
-            display: none;
-            width: 24px;
-            height: 24px;
-            background: #E57F54;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: help;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 0;
-            line-height: 24px;
-            text-align: center;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .answer-input.incorrect ~ .info-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .answer-select.incorrect ~ .info-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .info-btn:hover::after {
-            content: attr(data-answer);
-            position: absolute;
-            bottom: 130%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 14px;
-            white-space: nowrap;
-            z-index: 10;
-            pointer-events: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .info-btn:hover::before {
-            content: '';
-            position: absolute;
-            bottom: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: #333;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .dialogue-line {
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
-        .dialogue-dash {
-            display: inline-block;
-            margin-right: 5px;
-            color: #666;
-        }
-
-        .word-item {
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-
-        .word-term {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .button-group {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 20px;
-        }
-
-        .check-btn {
-            background: #E57F54;
-            color: white;
-            border: none;
-            padding: 12px 40px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .check-btn:hover {
-            background: #d46a3e;
-        }
-
-        .check-btn:active {
-            transform: scale(0.98);
-        }
-
-        .credit {
-            text-align: center;
-            font-size: 13px;
-            color: #999;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .credit-bold {
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="Assets/exercise-style.css">
 </head>
 <body>
     <div class="container">
@@ -322,10 +71,10 @@
                 </div>
 
                 <div class="dialogue-line">
-                    <span class="dialogue-dash">-</span>
+                    <span class="dialogue-dash">-</span> 
                     <div class="answer-wrapper">
                         <input type="text" class="answer-input" data-id="4" maxlength="10" placeholder="...">
-                        <button type="button" class="info-btn" data-answer="mész">?</button>
+                        <button type="button" class="info-btn" data-answer="Mész">?</button>
                     </div>
                     ma boltba?
                 </div>
@@ -387,10 +136,10 @@
                 </div>
 
                 <div class="dialogue-line">
-                    <span class="dialogue-dash">-</span>
+                    <span class="dialogue-dash">-</span> 
                     <div class="answer-wrapper">
                         <input type="text" class="answer-input" data-id="9" maxlength="10" placeholder="...">
-                        <button type="button" class="info-btn" data-answer="fogalma">?</button>
+                        <button type="button" class="info-btn" data-answer="Fogalma">?</button>
                     </div>
                     sincs, Tomikám. Akkor hozol nekem kicsi, sárga, akciós barackot?
                 </div>
@@ -454,15 +203,15 @@
                 </div>
 
                 <div class="word-item">
-                    <span class="word-term">ugye</span> = right?
+                    <div class="answer-wrapper">
+                        <input type="text" class="answer-input" data-id="14" maxlength="15" placeholder="...">
+                        <button type="button" class="info-btn" data-answer="ugye">?</button>
+                    </div>
+                    = right?
                 </div>
 
                 <div class="word-item">
-                    <div class="answer-wrapper">
-                        <input type="text" class="answer-input" data-id="14" maxlength="15" placeholder="...">
-                        <button type="button" class="info-btn" data-answer="másik">?</button>
-                    </div>
-                    = other
+                    <span class="word-term">másik</span> = other
                 </div>
 
                 <div class="word-item">
@@ -470,15 +219,15 @@
                 </div>
 
                 <div class="word-item">
-                    <span class="word-term">név</span> = name
+                    <div class="answer-wrapper">
+                        <input type="text" class="answer-input" data-id="15" maxlength="15" placeholder="...">
+                        <button type="button" class="info-btn" data-answer="név">?</button>
+                    </div>
+                    = name
                 </div>
 
                 <div class="word-item">
-                    <div class="answer-wrapper">
-                        <input type="text" class="answer-input" data-id="15" maxlength="15" placeholder="...">
-                        <button type="button" class="info-btn" data-answer="fogalma">?</button>
-                    </div>
-                    sincs = they have no idea
+                    <span class="word-term">fogalma sincs</span> = they have no idea
                 </div>
 
                 <div class="word-item">
@@ -490,15 +239,15 @@
                 </div>
 
                 <div class="word-item">
-                    <div class="answer-wrapper">
-                        <input type="text" class="answer-input" data-id="16" maxlength="15" placeholder="...">
-                        <button type="button" class="info-btn" data-answer="ősszel">?</button>
-                    </div>
-                    = in autumn
+                    <span class="word-term">ősszel</span> = in autumn
                 </div>
 
                 <div class="word-item">
-                    <span class="word-term">terem</span> = to grow (bear fruit)
+                    <div class="answer-wrapper">
+                        <input type="text" class="answer-input" data-id="16" maxlength="15" placeholder="...">
+                        <button type="button" class="info-btn" data-answer="terem">?</button>
+                    </div>
+                    = to grow (bear fruit)
                 </div>
             </div>
 
@@ -514,6 +263,8 @@
     </div>
 
     <script>
+        // Answers are generated by Assets/build-exercise.js - do not hand-edit.
+        // This inline block MUST stay above exercise-script.js.
         const answers = {
             '1': ['hamis'],
             '2': ['igaz'],
@@ -528,208 +279,12 @@
             '11': ['macskával', 'macskaval'],
             '12': ['akciós', 'akcios'],
             '13': ['hülye', 'hulye'],
-            '14': ['másik', 'masik'],
-            '15': ['fogalma'],
-            '16': ['ősszel', 'osszel']
+            '14': ['ugye'],
+            '15': ['név', 'nev'],
+            '16': ['terem']
         };
-
-        function checkAnswers() {
-            const inputs = document.querySelectorAll('.answer-input, .answer-select');
-
-            inputs.forEach(input => {
-                const id = input.getAttribute('data-id');
-                const userAnswer = input.value.toLowerCase().trim();
-                const correctAnswers = answers[id] || [];
-
-                input.classList.remove('correct', 'incorrect');
-
-                if (correctAnswers.includes(userAnswer)) {
-                    input.classList.add('correct');
-                } else if (userAnswer.length > 0) {
-                    input.classList.add('incorrect');
-                }
-            });
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-
-        document.getElementById('exerciseForm').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                checkAnswers();
-            }
-        });
-
-        (function selfCheck() {
-            try {
-                var MIN_DIALOGUE_GAPS = 5;
-                var MIN_WORDLIST_RATIO = 0.30;
-
-                var fold = function (s) {
-                    return String(s).toLowerCase().trim()
-                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-                };
-                var esc = function (s) {
-                    return String(s).replace(/[&<>]/g, function (c) {
-                        return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c];
-                    });
-                };
-                var errors = [], warnings = [];
-                var titleEl = document.querySelector('.title');
-                var isTemplate = /DIALOGUE_TITLE/.test(titleEl ? titleEl.textContent : '');
-                var q = function (sel, root) {
-                    return [].slice.call((root || document).querySelectorAll(sel));
-                };
-
-                var ids = q('[data-id]').map(function (el) { return el.getAttribute('data-id'); });
-                var seen = {}, dupes = {};
-                ids.forEach(function (id) { if (seen[id]) { dupes[id] = true; } else { seen[id] = true; } });
-                if (Object.keys(dupes).length)
-                    errors.push('Duplicate data-id: ' + Object.keys(dupes).join(', '));
-
-                var missing = Object.keys(seen).filter(function (id) { return !(id in answers); });
-                if (missing.length)
-                    errors.push('data-id in the page but missing from answers: ' + missing.join(', '));
-
-                var orphans = Object.keys(answers).filter(function (id) { return !seen[id]; });
-                if (orphans.length)
-                    errors.push('answers key with no matching field: ' + orphans.join(', '));
-
-                Object.keys(answers).forEach(function (id) {
-                    var list = (answers[id] || []).map(String);
-                    list.forEach(function (v) {
-                        if (v !== v.toLowerCase())
-                            errors.push('answers[' + id + '] is not lowercase: "' + v + '"');
-                    });
-                    if (new Set(list).size !== list.length)
-                        warnings.push('answers[' + id + '] lists the same spelling twice');
-                    list.forEach(function (v) {
-                        if (/[áéíóöőúüű]/.test(v)
-                            && !list.some(function (o) { return o !== v && fold(o) === fold(v); }))
-                            warnings.push('answers[' + id + ']: "' + v + '" has accents but no accent-free variant');
-                    });
-                });
-
-                q('.answer-wrapper').forEach(function (w) {
-                    var field = w.querySelector('[data-id]'), btn = w.querySelector('.info-btn');
-                    if (!field || !btn) return;
-                    var id = field.getAttribute('data-id');
-                    var shown = btn.getAttribute('data-answer') || '';
-                    var list = (answers[id] || []).map(fold);
-                    if (shown && list.length && list.indexOf(fold(shown)) === -1)
-                        errors.push('data-id ' + id + ': info button shows "' + shown
-                            + '" but answers has [' + (answers[id] || []).join(', ') + ']');
-                });
-
-                var vocabExact = {}, vocabStem = {};
-                var addVocab = function (raw) {
-                    var f = fold(raw);
-                    if (!f) return;
-                    vocabExact[f] = true;
-                    if (f.length >= 4) vocabStem[f] = true;
-                    f.split(/\s+/).forEach(function (tok) {
-                        if (tok.length >= 4) { vocabExact[tok] = true; vocabStem[tok] = true; }
-                    });
-                };
-                var wordItems = q('.word-item');
-                wordItems.forEach(function (item) {
-                    q('.word-term', item).forEach(function (t) { addVocab(t.textContent); });
-                    var inp = item.querySelector('[data-id]');
-                    if (inp) (answers[inp.getAttribute('data-id')] || []).forEach(addVocab);
-                });
-
-                var lines = q('.dialogue-line');
-                var gapped = lines.map(function (l) { return !!l.querySelector('[data-id]'); });
-                var gapCount = gapped.filter(Boolean).length;
-
-                if (!isTemplate && gapCount < MIN_DIALOGUE_GAPS)
-                    errors.push('Only ' + gapCount + ' dialogue gap(s) — at least '
-                        + MIN_DIALOGUE_GAPS + ' required');
-
-                var run = 0, pairs = 0;
-                for (var i = 0; i <= gapped.length; i++) {
-                    if (gapped[i]) { run++; continue; }
-                    if (run >= 3)
-                        errors.push('Lines ' + (i - run + 1) + '-' + i
-                            + ' all have gaps — a run of ' + run
-                            + ' is clustering, not conflict avoidance');
-                    else if (run === 2) {
-                        pairs++;
-                        warnings.push('Lines ' + (i - 1) + ' and ' + i
-                            + ' both have gaps — allowed only if unavoidable; confirm there was no alternative');
-                    }
-                    run = 0;
-                }
-                if (pairs > 1)
-                    warnings.push(pairs + ' consecutive pairs in one dialogue — that is more often than expected');
-
-                lines.forEach(function (line) {
-                    var inp = line.querySelector('[data-id]');
-                    if (!inp) return;
-                    var id = inp.getAttribute('data-id');
-                    (answers[id] || []).forEach(function (v) {
-                        var f = fold(v);
-                        if (vocabExact[f]) {
-                            errors.push('data-id ' + id + ': gap word "' + v + '" is in the word list');
-                            return;
-                        }
-                        if (f.length < 4) return;
-                        for (var k in vocabStem) {
-                            if (f.startsWith(k) || k.startsWith(f)) {
-                                warnings.push('data-id ' + id + ': gap word "' + v
-                                    + '" looks like a form of the word-list entry "' + k + '"');
-                                return;
-                            }
-                        }
-                    });
-                });
-
-                var blanked = wordItems.map(function (it) { return !!it.querySelector('[data-id]'); });
-                var nBlank = blanked.filter(Boolean).length;
-                if (wordItems.length) {
-                    var ratio = nBlank / wordItems.length;
-                    if (!isTemplate && ratio < MIN_WORDLIST_RATIO)
-                        errors.push('Only ' + nBlank + ' of ' + wordItems.length + ' word-list items blanked ('
-                            + Math.round(ratio * 100) + '%) — at least '
-                            + Math.round(MIN_WORDLIST_RATIO * 100) + '% required');
-                }
-                for (var j = 1; j < blanked.length; j++) {
-                    if (blanked[j] && blanked[j - 1])
-                        errors.push('Word list items ' + j + ' and ' + (j + 1)
-                            + ' are both blanked — leave at least one visible between blanks');
-                }
-
-                if (!errors.length && !warnings.length) {
-                    console.log('%c[self-check] All checks passed'
-                        + (isTemplate ? ' (template mode: count minimums skipped). ' : '. ')
-                        + gapCount + ' dialogue gaps, ' + nBlank + '/' + wordItems.length
-                        + ' word-list blanks.', 'color:#00CC00;font-weight:bold');
-                    return;
-                }
-                errors.forEach(function (e) { console.error('[self-check] ERROR: ' + e); });
-                warnings.forEach(function (w) { console.warn('[self-check] warning: ' + w); });
-
-                if (location.protocol !== 'file:') return;
-
-                var box = document.createElement('div');
-                box.style.cssText = 'position:sticky;top:0;z-index:9999;background:#FFB3B3;'
-                    + 'border:3px solid #FF0000;color:#660000;padding:14px 18px;margin:0 0 16px;'
-                    + 'font-family:Lexend,sans-serif;font-size:14px;line-height:1.5;border-radius:8px';
-                box.innerHTML = '<strong>&#9888; Self-check: ' + errors.length + ' error(s), '
-                    + warnings.length + ' warning(s)</strong>'
-                    + '<div style="font-size:12px;margin:4px 0 8px">Shown only when opened locally &mdash; learners never see this.</div>'
-                    + '<ul style="margin:0;padding-left:20px">'
-                    + errors.map(function (e) { return '<li><strong>ERROR:</strong> ' + esc(e) + '</li>'; }).join('')
-                    + warnings.map(function (w) { return '<li>warning: ' + esc(w) + '</li>'; }).join('')
-                    + '</ul>';
-                document.body.insertBefore(box, document.body.firstChild);
-            } catch (err) {
-                console.error('[self-check] the checker itself failed:', err);
-            }
-        })();
     </script>
+
+    <script src="Assets/exercise-script.js"></script>
 </body>
 </html>
