@@ -1,20 +1,32 @@
 #!/usr/bin/env node
-/* assets/build-exercise-data.js - validates and writes a dialogue DATA FILE for
- * the fetch-based engine (comprehension.html + assets/exercise-render-fetch.js).
+/* assets/build-exercise-data.js - validates a dialogue DATA FILE for the
+ * fetch-based engine (comprehension.html + assets/exercise-render-fetch.js).
  *
- * Usage: node assets/build-exercise-data.js <source.json> <output.json>
+ * Usage:
+ *   node assets/build-exercise-data.js <file.json>               validate in place
+ *   node assets/build-exercise-data.js <source.json> <out.json>  validate and write
  *
- * Unlike build-exercise-lite.js this writes NOTHING but the content JSON -
- * no HTML wrapper, no boilerplate, at all. The engine page is uploaded once
- * and reused by every dialogue; only this small data file changes per run.
+ * The published artifact is the content JSON and nothing else - no HTML
+ * wrapper, no boilerplate. The engine page is uploaded once and reused by every
+ * dialogue; only this small data file changes per run.
  *
- * Validation is identical to build-exercise-lite.js - see that file's header
- * for the invariants enforced here:
- *   - 3+ true/false statements, each igaz or hamis
- *   - 5+ dialogue lines, no multi-word [[gaps]]
- *   - 10+ word-list items, at least 30% blanked, never two blanks in a row
- * The dialogue GAP COUNT is deliberately never validated: the human chooses
- * it by underlining words in Notion, and any number is correct.
+ * Because the output is only the compacted input, the one-argument form is the
+ * normal path: write data/<slug>.json directly, validate it in place, and
+ * upload that exact file. The two-argument form is kept for the older
+ * source.json -> data/<slug>.json flow.
+ *
+ * Invariants enforced - this file is the source of truth for all of them:
+ *   - a non-empty title
+ *   - 3+ true/false statements, each answered igaz or hamis, each with text
+ *   - 5+ dialogue lines, at least one [[gap]], and no multi-word [[gaps]]
+ *   - 10+ word-list items, each with a term and a gloss
+ *   - at least 30% of word-list items blanked, never two blanks in a row
+ *
+ * The dialogue GAP COUNT is deliberately never validated: the human chooses it
+ * by underlining words in Notion, and any number is correct.
+ *
+ * Answer length is deliberately never validated either - the renderer no longer
+ * caps input length, so long words are fine.
  */
 const fs = require("fs")
 const path = require("path")
@@ -22,8 +34,8 @@ const path = require("path")
 const MIN_WORDLIST_RATIO = 0.3
 
 const [srcPath, outPath] = process.argv.slice(2)
-if (!srcPath || !outPath) {
-	console.error("Usage: node assets/build-exercise-data.js <source.json> <output.json>")
+if (!srcPath) {
+	console.error("Usage: node assets/build-exercise-data.js <file.json> [output.json]")
 	process.exit(1)
 }
 
@@ -98,12 +110,18 @@ if (errors.length) {
 	process.exit(1)
 }
 
-fs.mkdirSync(path.dirname(outPath), { recursive: true })
 const json = JSON.stringify(data)
-fs.writeFileSync(outPath, json)
+if (outPath) {
+	fs.mkdirSync(path.dirname(outPath), { recursive: true })
+	fs.writeFileSync(outPath, json)
+}
 
 const fields = tf.length + gaps + blanks.length
 console.log(
 	`fields=${fields} dialogue-gaps=${gaps} word-blanks=${blanks.length}/${words.length} (${Math.round(ratio * 100)}%)`,
 )
-console.log(`OK wrote ${outPath} (${Buffer.byteLength(json)} bytes)`)
+if (outPath) {
+	console.log(`OK wrote ${outPath} (${Buffer.byteLength(json)} bytes)`)
+} else {
+	console.log(`OK ${srcPath} is valid (${fs.statSync(srcPath).size} bytes on disk)`)
+}
