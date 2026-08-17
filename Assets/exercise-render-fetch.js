@@ -126,7 +126,7 @@
 		logo.appendChild(img)
 		container.appendChild(logo)
 
-		container.appendChild(h("div", "title", "\ud83c\udfaf " + data.title))
+		container.appendChild(h("div", "title", data.title))
 
 		var form = document.createElement("form")
 		form.id = "exerciseForm"
