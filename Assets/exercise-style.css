@@ -1,0 +1,257 @@
+/* ===== HUNGARIZE EXERCISE STYLESHEET =====
+   Shared by every generated exercise page.
+   Editing this file changes the look of ALL published exercises at once.
+
+   COLOUR SCHEME (DO NOT CHANGE)
+   Primary Brand Colour: #E57F54 (buttons, dividers, info circles)
+   Background: #F9CD8C (warm beige)
+   Correct Answer: #90EE90 (bright green) with border #00CC00
+   Incorrect Answer: #FFB3B3 (bright red) with border #FF0000
+   These colours are chosen for accessibility (colourblind-friendly).
+===== END HEADER ===== */
+
+body {
+    /* 'Lexend' is part of the Hungarize brand identity */
+    font-family: 'Lexend', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #F9CD8C;
+    line-height: 1.6;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo img {
+    display: block;
+    margin: 0 auto;
+}
+
+.title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.section-title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #E57F54;
+    padding-bottom: 8px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.statement {
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.statement-num {
+    font-weight: bold;
+    color: #666;
+}
+
+.answer-input {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    min-width: 80px;
+    transition: all 0.3s ease;
+}
+
+.answer-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.answer-input.correct {
+    background-color: #90EE90;
+    border-color: #00CC00;
+    color: #004D00;
+}
+
+.answer-input.incorrect {
+    background-color: #FFB3B3;
+    border-color: #FF0000;
+    color: #660000;
+}
+
+.answer-select {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.answer-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.answer-select.correct {
+    background-color: #90EE90;
+    border-color: #00CC00;
+    color: #004D00;
+}
+
+.answer-select.incorrect {
+    background-color: #FFB3B3;
+    border-color: #FF0000;
+    color: #660000;
+}
+
+/* Flexbox wrapper keeps input and info button inline */
+.answer-wrapper {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
+    margin-right: 5px;
+}
+
+/* Info button: only visible when the answer is incorrect */
+.info-btn {
+    display: none;
+    width: 24px;
+    height: 24px;
+    background: #E57F54;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: help;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0;
+    line-height: 24px;
+    text-align: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.answer-input.incorrect ~ .info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.answer-select.incorrect ~ .info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-btn:hover::after {
+    content: attr(data-answer);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.info-btn:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #333;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.dialogue-line {
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.dialogue-dash {
+    display: inline-block;
+    margin-right: 5px;
+    color: #666;
+}
+
+.word-item {
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.word-term {
+    font-weight: bold;
+    color: #333;
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.check-btn {
+    background: #E57F54;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.check-btn:hover {
+    background: #d46a3e;
+}
+
+.check-btn:active {
+    transform: scale(0.98);
+}
+
+.credit {
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.credit-bold {
+    font-weight: bold;
+    color: #333;
+}
