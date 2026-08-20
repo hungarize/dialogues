@@ -43,7 +43,7 @@
 			loadRuntime()
 		})
 		.catch(function (err) {
-			root.textContent = "Couldn't load this exercise (" + slug + "): No exercise found at this URL. Recently uploaded exercises can take a few minutes to become available." + err.message
+			root.textContent = "Couldn't load this exercise (" + slug + "): No exercise found at this URL. Recently uploaded exercises can take a few minutes to become available. - " + err.message
 			console.error("[engine] ERROR: " + err.message)
 		})
 
