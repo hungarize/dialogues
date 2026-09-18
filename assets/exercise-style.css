@@ -2,256 +2,404 @@
    Shared by every generated exercise page.
    Editing this file changes the look of ALL published exercises at once.
 
-   COLOUR SCHEME (DO NOT CHANGE)
-   Primary Brand Colour: #E57F54 (buttons, dividers, info circles)
-   Background: #F9CD8C (warm beige)
-   Correct Answer: #90EE90 (bright green) with border #00CC00
-   Incorrect Answer: #FFB3B3 (bright red) with border #FF0000
+   COLOUR SCHEME (DO NOT CHANGE THE LIGHT-MODE VALUES)
+   Primary Brand Colour: #E57F54 (buttons, dividers, info circles) - same in both modes
+   Light-mode background: #F9CD8C (warm beige)
+   Light-mode correct answer: #90EE90 (bright green) with border #00CC00
+   Light-mode incorrect answer: #FFB3B3 (bright red) with border #FF0000
    These colours are chosen for accessibility (colourblind-friendly).
+
+   Dark mode (added later) follows the OS/browser's prefers-color-scheme
+   automatically - no toggle, no JS. All colours that differ between modes
+   are defined once below as CSS custom properties; add a new colour by
+   defining it in both the :root block and the dark override block.
 ===== END HEADER ===== */
 
+:root {
+	--page-bg: #F9CD8C;
+	--card-bg: #ffffff;
+	--card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	--text-primary: #333;
+	--text-muted: #666;
+
+	--input-bg: #ffffff;
+	--input-border: #ddd;
+	--input-text: #333;
+
+	--correct-bg: #90EE90;
+	--correct-border: #00CC00;
+	--correct-text: #004D00;
+
+	--incorrect-bg: #FFB3B3;
+	--incorrect-border: #FF0000;
+	--incorrect-text: #660000;
+
+	--lenient-info-bg: #64B5F6;
+
+	--credit-text: #999;
+	--credit-border: #eee;
+
+	--celebrate-bg: #E6F9E6;
+	--celebrate-border: #2E7D32;
+	--celebrate-text: #1B5E20;
+
+	/* .container box-shadow while the exercise hasn't been checked yet (or
+	   was left blank) - unchanged from the original light-mode shadow. */
+	--glow-idle: var(--card-shadow);
+	/* .container box-shadow once every field is correct - none in light
+	   mode, since the celebration banner/confetti already say it clearly. */
+	--glow-correct: var(--card-shadow);
+	/* .container box-shadow once at least one field is wrong - a solid ring
+	   plus a soft glow, so it stays legible regardless of what's behind it. */
+	--glow-incorrect: 0 0 0 3px rgba(220, 0, 0, 0.85), 0 0 16px rgba(220, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--page-bg: #121212;
+		--card-bg: #1E1E22;
+		--card-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+		--text-primary: #EAEAEA;
+		--text-muted: #9AA0A6;
+
+		--input-bg: #2A2A2E;
+		--input-border: #4A4A4F;
+		--input-text: #EAEAEA;
+
+		--correct-bg: #1B3B1B;
+		--correct-border: #00CC00;
+		--correct-text: #A5D6A7;
+
+		--incorrect-bg: #3B1B1B;
+		--incorrect-border: #FF6B6B;
+		--incorrect-text: #FFB3B3;
+
+		--credit-text: #8A8A8E;
+		--credit-border: #333;
+
+		--celebrate-bg: #1B3B1B;
+		--celebrate-border: #66BB6A;
+		--celebrate-text: #A5D6A7;
+
+		/* Idle state gets its own amber glow in dark mode - a plain shadow
+		   barely reads against a near-black page. */
+		--glow-idle: 0 0 18px rgba(255, 193, 7, 0.55);
+		--glow-correct: 0 0 20px rgba(0, 204, 0, 0.6);
+		--glow-incorrect: 0 0 0 3px rgba(255, 0, 0, 0.85), 0 0 20px rgba(255, 0, 0, 0.5);
+	}
+}
+
 body {
-    /* 'Lexend' is part of the Hungarize brand identity */
-    font-family: 'Lexend', sans-serif;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #F9CD8C;
-    line-height: 1.6;
+	/* 'Lexend' is part of the Hungarize brand identity */
+	font-family: 'Lexend', sans-serif;
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 20px;
+	background: var(--page-bg);
+	line-height: 1.6;
 }
 
 .container {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	background: var(--card-bg);
+	padding: 30px;
+	border-radius: 8px;
+	box-shadow: var(--glow-idle);
+}
+
+.container.state-correct {
+	box-shadow: var(--glow-correct);
+}
+
+.container.state-incorrect {
+	box-shadow: var(--glow-incorrect);
 }
 
 .logo {
-    text-align: center;
-    margin-bottom: 30px;
+	text-align: center;
+	margin-bottom: 30px;
 }
 
 .logo img {
-    display: block;
-    margin: 0 auto;
+	display: block;
+	margin: 0 auto;
 }
 
 .title {
-    font-family: 'Lexend', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 30px;
-    color: #333;
+	font-family: 'Lexend', sans-serif;
+	font-size: 28px;
+	font-weight: 700;
+	text-align: center;
+	margin-bottom: 30px;
+	color: var(--text-primary);
 }
 
 .section-title {
-    font-family: 'Lexend', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    margin-top: 30px;
-    margin-bottom: 15px;
-    color: #333;
-    border-bottom: 2px solid #E57F54;
-    padding-bottom: 8px;
+	font-family: 'Lexend', sans-serif;
+	font-size: 18px;
+	font-weight: 600;
+	margin-top: 30px;
+	margin-bottom: 15px;
+	color: var(--text-primary);
+	border-bottom: 2px solid #E57F54;
+	padding-bottom: 8px;
 }
 
 .section {
-    margin-bottom: 30px;
+	margin-bottom: 30px;
 }
 
 .statement {
-    margin-bottom: 12px;
-    font-size: 16px;
+	margin-bottom: 12px;
+	font-size: 16px;
+	color: var(--text-primary);
 }
 
 .statement-num {
-    font-weight: bold;
-    color: #666;
+	font-weight: bold;
+	color: var(--text-muted);
+}
+
+#celebrate-banner {
+	max-width: 900px;
+	margin: 0 auto 20px;
+	text-align: center;
+	background: var(--celebrate-bg);
+	border: 2px solid var(--celebrate-border);
+	border-radius: 8px;
+	padding: 16px;
+	font-family: 'Lexend', sans-serif;
+	font-weight: 600;
+	color: var(--celebrate-text);
+	font-size: 18px;
+	opacity: 0;
+	transform: translateY(-8px);
+	animation: celebrate-banner-in 0.45s ease-out forwards;
+}
+
+@keyframes celebrate-banner-in {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.confetti-piece {
+	position: fixed;
+	top: -20px;
+	width: 10px;
+	height: 10px;
+	z-index: 9999;
+	pointer-events: none;
+	border-radius: 2px;
+	animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+	to {
+		transform: translateY(110vh) rotate(540deg);
+		opacity: 0.9;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.confetti-piece {
+		display: none;
+	}
+
+	#celebrate-banner {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .answer-input {
-    padding: 8px 12px;
-    border: 2px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    min-width: 80px;
-    transition: all 0.3s ease;
+	padding: 6px 12px;
+	border: 2px solid var(--input-border);
+	border-radius: 4px;
+	font-size: 16px;
+	min-width: 80px;
+	background-color: var(--input-bg);
+	color: var(--input-text);
+	transition: all 0.3s ease;
 }
 
 .answer-input:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+	outline: none;
+	border-color: #007bff;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
-.answer-input.correct {
-    background-color: #90EE90;
-    border-color: #00CC00;
-    color: #004D00;
+.answer-input.correct,
+.answer-select.correct {
+	background-color: var(--correct-bg);
+	border-color: var(--correct-border);
+	color: var(--correct-text);
 }
 
-.answer-input.incorrect {
-    background-color: #FFB3B3;
-    border-color: #FF0000;
-    color: #660000;
+.answer-input.incorrect,
+.answer-select.incorrect {
+	background-color: var(--incorrect-bg);
+	border-color: var(--incorrect-border);
+	color: var(--incorrect-text);
 }
 
 .answer-select {
-    padding: 8px 12px;
-    border: 2px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    background-color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
+	padding: 6px 12px;
+	border: 2px solid var(--input-border);
+	border-radius: 4px;
+	font-size: 16px;
+	background-color: var(--input-bg);
+	color: var(--input-text);
+	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .answer-select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+	outline: none;
+	border-color: #007bff;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
-.answer-select.correct {
-    background-color: #90EE90;
-    border-color: #00CC00;
-    color: #004D00;
+.answer-select option {
+	background-color: var(--input-bg);
+	color: var(--input-text);
 }
 
-.answer-select.incorrect {
-    background-color: #FFB3B3;
-    border-color: #FF0000;
-    color: #660000;
-}
-
-/* Flexbox wrapper keeps input and info button inline */
+/* Flexbox wrapper keeps input and info button inline. Small vertical margin
+   so two wrapped lines' boxes don't touch when a dialogue line wraps. */
 .answer-wrapper {
-    display: inline-flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    gap: 8px;
-    margin-right: 5px;
+	display: inline-flex !important;
+	flex-direction: row !important;
+	align-items: center;
+	gap: 8px;
+	margin: 1px 5px 1px 0;
 }
 
-/* Info button: only visible when the answer is incorrect */
+/* Info button: only visible when the answer is incorrect, or correct only
+   thanks to accent/punctuation leniency (shown in blue with "i" instead of
+   the orange "?", so the student still sees the canonical spelling). */
 .info-btn {
-    display: none;
-    width: 24px;
-    height: 24px;
-    background: #E57F54;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: help;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 0;
-    line-height: 24px;
-    text-align: center;
-    position: relative;
-    flex-shrink: 0;
+	display: none;
+	width: 24px;
+	height: 24px;
+	background: #E57F54;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	cursor: help;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 0;
+	line-height: 24px;
+	text-align: center;
+	position: relative;
+	flex-shrink: 0;
 }
 
-.answer-input.incorrect ~ .info-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.answer-input.incorrect~.info-btn,
+.answer-select.incorrect~.info-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.answer-select.incorrect ~ .info-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.answer-input.correct-lenient~.info-btn,
+.answer-select.correct-lenient~.info-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--lenient-info-bg);
 }
 
 .info-btn:hover::after {
-    content: attr(data-answer);
-    position: absolute;
-    bottom: 130%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    white-space: nowrap;
-    z-index: 10;
-    pointer-events: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+	content: attr(data-answer);
+	position: absolute;
+	bottom: 130%;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #333;
+	color: white;
+	padding: 8px 12px;
+	border-radius: 4px;
+	font-size: 14px;
+	white-space: nowrap;
+	z-index: 10;
+	pointer-events: none;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .info-btn:hover::before {
-    content: '';
-    position: absolute;
-    bottom: 120%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: #333;
-    z-index: 10;
-    pointer-events: none;
+	content: '';
+	position: absolute;
+	bottom: 120%;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 6px solid transparent;
+	border-top-color: #333;
+	z-index: 10;
+	pointer-events: none;
 }
 
 .dialogue-line {
-    margin-bottom: 8px;
-    font-size: 15px;
+	margin-bottom: 8px;
+	font-size: 15px;
+	color: var(--text-primary);
 }
 
 .dialogue-dash {
-    display: inline-block;
-    margin-right: 5px;
-    color: #666;
+	display: inline-block;
+	margin-right: 5px;
+	color: var(--text-muted);
 }
 
 .word-item {
-    margin-bottom: 10px;
-    font-size: 15px;
+	margin-bottom: 10px;
+	font-size: 15px;
+	color: var(--text-primary);
 }
 
 .word-term {
-    font-weight: bold;
-    color: #333;
+	font-weight: bold;
+	color: var(--text-primary);
 }
 
 .button-group {
-    text-align: center;
-    margin-top: 40px;
-    margin-bottom: 20px;
+	text-align: center;
+	margin-top: 40px;
+	margin-bottom: 20px;
 }
 
 .check-btn {
-    background: #E57F54;
-    color: white;
-    border: none;
-    padding: 12px 40px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease;
+	background: #E57F54;
+	color: white;
+	border: none;
+	padding: 12px 40px;
+	font-size: 16px;
+	font-weight: 600;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.3s ease;
 }
 
 .check-btn:hover {
-    background: #d46a3e;
+	background: #d46a3e;
 }
 
 .check-btn:active {
-    transform: scale(0.98);
+	transform: scale(0.98);
 }
 
 .credit {
-    text-align: center;
-    font-size: 13px;
-    color: #999;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+	text-align: center;
+	font-size: 13px;
+	color: var(--credit-text);
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 1px solid var(--credit-border);
 }
 
 .credit-bold {
-    font-weight: bold;
-    color: #333;
+	font-weight: bold;
+	color: var(--text-primary);
 }
