@@ -1,0 +1,40 @@
+name: Sync public dialogue database
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+      timezone: "Europe/Budapest"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Dry run previews changes; apply writes them to Notion"
+        required: true
+        default: "dry-run"
+        type: choice
+        options:
+          - dry-run
+          - apply
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-public-dialogue-database
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      SYNC_MODE: ${{ github.event_name == 'schedule' && 'apply' || inputs.mode }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate sync script
+        run: node scripts/sync-public-database.mjs --self-test
+
+      - name: Synchronise public database
+        run: node scripts/sync-public-database.mjs
