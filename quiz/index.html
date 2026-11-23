@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Hungarian Study Style</title>
+<style>
+  :root { --bg:#faf7f2; --card:#fff; --ink:#2b2b2b; --muted:#6b6b6b; --accent:#c0392b; --accent2:#2e7d5b; --line:#e7e1d8; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1b1a19; --card:#262422; --ink:#eee; --muted:#aaa; --line:#3a3633; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  .wrap { max-width:680px; margin:0 auto; padding:24px 16px 60px; }
+  header h1 { margin:0 0 4px; font-size:1.6rem; }
+  header p { margin:0 0 20px; color:var(--muted); }
+  .bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden; margin-bottom:20px; }
+  .bar i { display:block; height:100%; background:var(--accent); width:0; transition:width .3s; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
+  .q { font-size:1.15rem; font-weight:600; margin:0 0 6px; }
+  .count { color:var(--muted); font-size:.85rem; margin-bottom:14px; }
+  .opt { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:1px solid var(--line); border-radius:10px; background:transparent; color:inherit; font:inherit; cursor:pointer; }
+  .opt:hover { border-color:var(--accent); }
+  .opt.sel { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, transparent); }
+  .nav { display:flex; justify-content:space-between; margin-top:16px; }
+  .btn { padding:10px 18px; border-radius:10px; border:0; background:var(--accent); color:#fff; font:inherit; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; }
+  .btn.ghost { background:transparent; color:var(--muted); border:1px solid var(--line); }
+  .btn:disabled { opacity:.4; cursor:default; }
+  h2 { margin:28px 0 8px; font-size:1.2rem; }
+  .tip { border-left:4px solid var(--accent2); padding:4px 0 4px 14px; margin:14px 0; }
+  .tip b { display:block; }
+  .offer { border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0; background:var(--card); }
+  .offer h3 { margin:0 0 4px; font-size:1rem; }
+  .offer p { margin:0 0 10px; color:var(--muted); font-size:.95rem; }
+  .profile { font-size:1.05rem; }
+  .quote { color:var(--muted); font-style:italic; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>What kind of Hungarian learner are you?</h1>
+    <p>Answer 8 quick questions about your learning habits and get study tips picked for you, based on the Hungarize Study Guide.</p>
+  </header>
+  <div class="bar"><i id="bar"></i></div>
+  <div id="app" class="card"></div>
+</div>
+
+<script>
+const L = {
+  patreon:   "https://patreon.com/hungarize",
+  membership:"https://hungarize.com/membership",
+  services:  "https://hungarize.com/services/",
+  booking:   "https://calendly.com/laci-hungarize",
+  dailyQ:    "https://hungarize.com/daily-question/",
+  correction:"https://subscribepage.io/answercorrection",
+  voice:     "https://subscribepage.io/voicemessages",
+  dlesson:   "https://subscribepage.io/dialoguelesson"
+};
+
+// Each option adds points to profile keys.
+const QUESTIONS = [
+  { q:"How often do you practise Hungarian?", o:[
+    ["Every day, even if just a few minutes", {habit:2}],
+    ["A few times a week", {habit:1}],
+    ["Once a week or in bursts when I have time", {busy:2}],
+    ["Honestly, not very regularly", {busy:2, habit:-1}] ]},
+  { q:"How much time can you usually spare in one sitting?", o:[
+    ["5–15 minutes", {busy:2}],
+    ["15–30 minutes", {habit:1}],
+    ["30–60 minutes", {deep:1}],
+    ["More than an hour, once or twice a week", {deep:2}] ]},
+  { q:"What do you enjoy most when learning?", o:[
+    ["Listening to dialogues and podcasts", {listening:2}],
+    ["Reading texts and transcripts", {reading:2}],
+    ["Writing my own sentences", {writing:2}],
+    ["Talking with people", {speaking:2}] ]},
+  { q:"Which skill feels weakest right now?", o:[
+    ["Understanding spoken Hungarian", {listening:3}],
+    ["Reading longer texts", {reading:3}],
+    ["Writing correctly", {writing:3}],
+    ["Speaking with confidence", {speaking:3}] ]},
+  { q:"How do you deal with new words?", o:[
+    ["I write them in a list and try to memorise them", {vocab:2}],
+    ["I use flashcard apps like Anki or Quizlet", {vocab:1}],
+    ["I guess from context and move on", {reading:1}],
+    ["I forget them quickly — that's my problem!", {vocab:3}] ]},
+  { q:"How often do you get feedback on your Hungarian?", o:[
+    ["Regularly, from a teacher", {feedback:0}],
+    ["Sometimes, from friends or family", {feedback:1}],
+    ["Rarely", {feedback:2}],
+    ["Never — I study completely alone", {feedback:3, alone:1}] ]},
+  { q:"How do you feel about speaking Hungarian?", o:[
+    ["I love it and do it whenever I can", {speaking:0}],
+    ["I'd like to, but I have no one to talk to", {speaking:2, alone:2}],
+    ["I get nervous and freeze", {speaking:3}],
+    ["I'm not ready yet, I need more words first", {speaking:2}] ]},
+  { q:"Which sounds most like your goal right now?", o:[
+    ["Build a steady daily habit", {habit:2, busy:1}],
+    ["Finally have real conversations", {speaking:2, alone:1}],
+    ["Get my mistakes corrected", {feedback:2, writing:1}],
+    ["Get a structured plan with a teacher", {deep:2, alone:1}] ]}
+];
+
+const TIPS = {
+  listening:{ title:"Boost your listening", tips:[
+    ["Listen actively, not just in the background.", "Pick one daily dialogue and give it your full attention: who is speaking, what about, what is the situation?"],
+    ["Use the 60–80% rule.", "Mostly listen to audio where you understand 60–80% — and from time to time try something above your level, to prepare for real Hungarians."],
+    ["Layer it up.", "Listen without the transcript, then with it, then with the word list, then with the translation. Notice how much more you understand each round."] ]},
+  reading:{ title:"Boost your reading", tips:[
+    ["Skim first, then dive in.", "Get the big picture on the first read; look up words only on the second."],
+    ["Read aloud.", "It improves pronunciation and helps you remember words and sentence structures."],
+    ["Re-read old dialogues.", "Once you know the story you can read for fun and revise vocabulary at the same time."] ]},
+  writing:{ title:"Boost your writing", tips:[
+    ["Answer the daily question in 2–4 sentences.", "A short daily answer is the easiest writing routine there is."],
+    ["Keep it simple.", "Use structures you already know or have just seen — don't try to translate your native language word for word."],
+    ["Get regular feedback.", "You don't need every text corrected, but don't let the same mistake repeat until it sticks."] ]},
+  speaking:{ title:"Boost your speaking", tips:[
+    ["Start speaking badly — today.", "Don't wait until you know “enough”. Whatever you can say in Hungarian, say it in Hungarian."],
+    ["Talk to yourself or record yourself.", "Answer the question of the day out loud, or record a voice message and listen back."],
+    ["Shadow the dialogues.", "Pick a role and say the lines together with the speaker."] ]},
+  vocab:{ title:"Remember more words", tips:[
+    ["Learn words in context, not from random lists.", "Write each new word down with the sentence it came from."],
+    ["Set a small goal.", "E.g. pick 5 useful words from today's dialogue and focus only on those."],
+    ["Use the word right away.", "Write your own personal sentence with it, or use it in your answer to the daily question."] ]},
+  habit:{ title:"Keep your habit going", tips:[
+    ["Little and often beats a lot, rarely.", "10–15 minutes a day is enough — listen to the daily dialogue a couple of times with your morning tea."],
+    ["Use the resource library.", "Each day is independent, so you never need to “catch up”. Skip what doesn't interest you."] ]},
+  busy:{ title:"Learning on a busy schedule", tips:[
+    ["Micro-doses count.", "On busy days just listen to the dialogue once or twice, or answer the question of the day in your head."],
+    ["Set aside one weekly block.", "1–2 hours a week to browse past posts and dive deeper into the ones you like."] ]},
+  deep:{ title:"Making the most of longer sessions", tips:[
+    ["Combine skills in one session.", "Listen → read the transcript → note words → summarise out loud → write your own sentences."],
+    ["Experiment with the order.", "There's no single best method — try different task sequences and keep what you enjoy."] ]}
+};
+
+let step = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+const app = document.getElementById("app");
+const bar = document.getElementById("bar");
+
+function renderQuestion() {
+  const Q = QUESTIONS[step];
+  bar.style.width = (step / QUESTIONS.length * 100) + "%";
+  app.innerHTML = `
+    <div class="count">Question ${step+1} of ${QUESTIONS.length}</div>
+    <p class="q">${Q.q}</p>
+    ${Q.o.map((o,i)=>`<button class="opt ${answers[step]===i?'sel':''}" data-i="${i}">${o[0]}</button>`).join("")}
+    <div class="nav">
+      <button class="btn ghost" id="back" ${step===0?'disabled':''}>Back</button>
+      <button class="btn" id="next" ${answers[step]===null?'disabled':''}>${step===QUESTIONS.length-1?'See my results':'Next'}</button>
+    </div>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    answers[step] = +b.dataset.i;
+    if (step < QUESTIONS.length-1) { step++; renderQuestion(); } else renderQuestion();
+  });
+  document.getElementById("back").onclick = () => { step--; renderQuestion(); };
+  document.getElementById("next").onclick = () => {
+    if (answers[step]===null) return;
+    if (step < QUESTIONS.length-1) { step++; renderQuestion(); } else renderResults();
+  };
+}
+
+function score() {
+  const s = {};
+  answers.forEach((a,qi) => {
+    const pts = QUESTIONS[qi].o[a][1];
+    for (const k in pts) s[k] = (s[k]||0) + pts[k];
+  });
+  return s;
+}
+
+function offer(title, text, url, label) {
+  return `<div class="offer"><h3>${title}</h3><p>${text}</p><a class="btn" href="${url}" target="_blank" rel="noopener">${label}</a></div>`;
+}
+
+function renderResults() {
+  bar.style.width = "100%";
+  const s = score();
+  const skills = ["listening","reading","writing","speaking","vocab"].sort((a,b)=>(s[b]||0)-(s[a]||0));
+  const focus = skills.slice(0,2);
+  const rhythm = (s.busy||0) >= (s.deep||0) && (s.busy||0) >= (s.habit||0) ? "busy" : ((s.deep||0) > (s.habit||0) ? "deep" : "habit");
+  const names = {listening:"listening",reading:"reading",writing:"writing",speaking:"speaking",vocab:"vocabulary"};
+  const rhythmName = {busy:"a busy learner who needs short doses", deep:"a deep-diver who likes longer sessions", habit:"a steady daily learner"};
+
+  let html = `<p class="count">Your results</p>
+    <p class="profile">You're <b>${rhythmName[rhythm]}</b>, and your biggest wins will come from working on your <b>${names[focus[0]]}</b> and <b>${names[focus[1]]}</b>.</p>`;
+
+  [focus[0], focus[1], rhythm].forEach(k => {
+    const t = TIPS[k];
+    html += `<h2>${t.title}</h2>` + t.tips.map(([b,p])=>`<div class="tip"><b>${b}</b>${p}</div>`).join("");
+  });
+
+  // Recommended services
+  html += `<h2>Recommended for you</h2>`;
+  const recs = [];
+  if ((s.speaking||0) >= 3 || (s.alone||0) >= 2)
+    recs.push(offer("Book a lesson with us", "One-to-one lessons are the safest place to start speaking — with a teacher who knows when to correct you and when not to interrupt.", L.booking, "Book a lesson"));
+  if ((s.speaking||0) >= 2)
+    recs.push(offer("Dialogue-based lessons", "Talk about the topics of the daily dialogues with us, using the words you've just learned.", L.dlesson, "Learn more"));
+  if ((s.speaking||0) >= 2 || focus.includes("listening"))
+    recs.push(offer("Voice & video messages with Barbi", "Answer the question of the day in a WhatsApp voice or video message and Barbi replies the same way — speaking and listening practice in one.", L.voice, "Try voice messaging"));
+  if ((s.feedback||0) >= 2 || focus.includes("writing"))
+    recs.push(offer("Daily answer correction", "Get your written answers to the daily question corrected so mistakes don't take root.", L.correction, "Get corrections"));
+  if ((s.deep||0) >= 2)
+    recs.push(offer("Group conversation lessons", "Join Laci and fellow learners at your level for regular group conversation.", L.services, "See all services"));
+  recs.push(offer("Daily Dose of Hungarian on Patreon", "A new dialogue every weekday with transcript, translation, word list, gap-fill and a daily question. Choose the <b>Starter</b> tier for simplified dialogues or <b>Classic</b> for semi-authentic ones — and upgrade any time.", L.patreon, "Compare tiers"));
+  html += recs.join("");
+
+  html += `<p class="quote">“Every student can learn, just not on the same day or in the same way.” — George Evans</p>
+    <div class="nav"><button class="btn ghost" id="restart">Retake the quiz</button><a class="btn ghost" href="${L.services}" target="_blank" rel="noopener">All Hungarize services</a></div>`;
+  app.innerHTML = html;
+  document.getElementById("restart").onclick = () => { step=0; answers.fill(null); renderQuestion(); window.scrollTo(0,0); };
+  window.scrollTo(0,0);
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
