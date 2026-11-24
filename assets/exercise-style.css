@@ -287,7 +287,8 @@ body {
 	color: white;
 	border: none;
 	border-radius: 50%;
-	cursor: help;
+	/* pointer, not help: the button is clickable (pins the spelling bubble) */
+	cursor: pointer;
 	font-size: 14px;
 	font-weight: bold;
 	padding: 0;
@@ -312,27 +313,74 @@ body {
 	background: var(--lenient-info-bg);
 }
 
-.info-btn:hover::after {
-	content: attr(data-answer);
+/* Spelling bubble above the info button: ::after is the bubble showing
+   data-answer, ::before is its little arrow. The look is defined once here
+   WITHOUT `content`, so neither pseudo-element exists until one of the rules
+   below switches it on:
+   - .show-answer: pinned by a click/tap (or Enter/Space) - toggled by
+     exercise-script.js, which also clears it on Escape, a click elsewhere,
+     editing that answer, or Check Answers. Hover alone was not discoverable:
+     on a Mac you had to rest the pointer on the button, and clicking did
+     nothing.
+   - :hover, only on devices with a real hover (mouse/trackpad), so a tap on a
+     touch screen doesn't leave a "sticky hover" bubble that a second tap
+     can't close.
+   The bubble is absolutely positioned, so showing it never shifts the
+   layout. It may wrap onto several lines and is capped to the viewport width
+   so a long answer can't run off a narrow (~390 px) screen. */
+.info-btn::after {
 	position: absolute;
 	bottom: 130%;
 	left: 50%;
-	transform: translateX(-50%);
+	/* --answer-bubble-shift is set by exercise-script.js: near the left/right
+	   edge of the screen a centred bubble would be cut off (or cause sideways
+	   scrolling), so it is nudged just far enough to stay on screen. The arrow
+	   (::before) stays centred on the button. */
+	transform: translateX(calc(-50% + var(--answer-bubble-shift, 0px)));
 	background: #333;
 	color: white;
 	padding: 8px 12px;
 	border-radius: 4px;
 	font-size: 14px;
-	white-space: nowrap;
+	line-height: 1.35;
+	text-align: center;
+	/* border-box: the max-width below includes the padding, matching the
+	   width estimate in exercise-script.js */
+	box-sizing: border-box;
+	width: max-content;
+	max-width: min(260px, calc(100vw - 48px));
+	white-space: normal;
+	overflow-wrap: break-word;
 	z-index: 10;
 	pointer-events: none;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.info-btn:hover::before {
+.info-btn.show-answer::after {
+	content: attr(data-answer);
+}
+
+.info-btn.show-answer::before {
 	content: '';
+}
+
+@media (hover: hover) {
+	.info-btn:hover::after {
+		content: attr(data-answer);
+	}
+
+	.info-btn:hover::before {
+		content: '';
+	}
+}
+
+/* The arrow is a 12px box whose top half is the visible triangle. bottom: 80%
+   (of the 24px button) puts that triangle right under the bubble (which sits
+   at bottom: 130%); the old 120% tucked it inside the bubble, so it never
+   showed - and it matters now that the bubble can be nudged sideways. */
+.info-btn::before {
 	position: absolute;
-	bottom: 120%;
+	bottom: 80%;
 	left: 50%;
 	transform: translateX(-50%);
 	border: 6px solid transparent;
