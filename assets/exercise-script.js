@@ -73,6 +73,9 @@ function celebrate() {
 }
 
 function checkAnswers() {
+	// A pinned spelling bubble belongs to the previous check - close it.
+	hideAllAnswers();
+
 	var inputs = document.querySelectorAll('.answer-input, .answer-select');
 
 	inputs.forEach(function (input) {
@@ -135,9 +138,122 @@ function checkAnswers() {
 
 document.getElementById('exerciseForm').addEventListener('keypress', function (event) {
 	if (event.key === 'Enter') {
+		// Enter on a focused info button should toggle its spelling bubble
+		// (the button's own click), not check the whole exercise.
+		if (event.target.classList && event.target.classList.contains('info-btn')) return;
 		event.preventDefault();
 		checkAnswers();
 	}
+});
+
+/* ----- Spelling bubble: click/tap to pin -----
+ * The correct spelling lives in each .info-btn's data-answer attribute and is
+ * drawn by CSS (.info-btn::after). Hover alone was not discoverable - on a
+ * Mac you had to rest the pointer on the button and clicking did nothing - so
+ * a click/tap (or Enter/Space, since it's a <button>) now pins the bubble by
+ * adding .show-answer. Only one bubble is pinned at a time. It closes on a
+ * second click, a click anywhere else, Escape, editing that answer, or Check
+ * Answers.
+ *
+ * Event delegation on document, because the buttons are built by
+ * exercise-render-fetch.js. Nothing here touches the button's visible text
+ * ("?" / "i", set by checkAnswers) or data-answer (read by the self-check).
+ */
+var ANSWER_LABEL_HIDDEN = 'Show the correct spelling';
+var ANSWER_LABEL_SHOWN = 'Correct spelling: ';
+// Keep in step with the bubble's max-width in exercise-style.css.
+var ANSWER_BUBBLE_MAX_WIDTH = 260;
+var ANSWER_BUBBLE_PADDING = 24; // 12px left + 12px right
+var ANSWER_BUBBLE_EDGE_GAP = 8; // keep at least this far from the screen edge
+
+var answerMeasureCtx = null;
+
+// Nudges the bubble sideways (CSS variable --answer-bubble-shift) when a
+// centred bubble would stick out of the window - a gap near the edge of a
+// narrow screen. The bubble is a pseudo-element and can't be measured
+// directly, so its width is estimated from the answer text in the button's
+// own font.
+function placeAnswerBubble(btn) {
+	var viewport = document.documentElement.clientWidth || window.innerWidth;
+	var maxWidth = Math.min(ANSWER_BUBBLE_MAX_WIDTH, viewport - 48); // same cap as the CSS
+	var bubbleWidth = maxWidth;
+	try {
+		if (!answerMeasureCtx) answerMeasureCtx = document.createElement('canvas').getContext('2d');
+		var cs = window.getComputedStyle(btn);
+		answerMeasureCtx.font = cs.fontWeight + ' 14px ' + cs.fontFamily;
+		var textWidth = answerMeasureCtx.measureText(btn.getAttribute('data-answer') || '').width;
+		bubbleWidth = Math.min(maxWidth, Math.ceil(textWidth) + ANSWER_BUBBLE_PADDING);
+	} catch (err) {
+		// no canvas: assume the widest bubble, which only errs on the safe side
+	}
+	var rect = btn.getBoundingClientRect();
+	var left = rect.left + rect.width / 2 - bubbleWidth / 2;
+	var shift = 0;
+	if (left < ANSWER_BUBBLE_EDGE_GAP) {
+		shift = ANSWER_BUBBLE_EDGE_GAP - left;
+	} else if (left + bubbleWidth > viewport - ANSWER_BUBBLE_EDGE_GAP) {
+		shift = viewport - ANSWER_BUBBLE_EDGE_GAP - (left + bubbleWidth);
+	}
+	btn.style.setProperty('--answer-bubble-shift', Math.round(shift) + 'px');
+}
+
+function showAnswer(btn) {
+	placeAnswerBubble(btn);
+	btn.classList.add('show-answer');
+	btn.setAttribute('aria-expanded', 'true');
+	// Screen readers don't see the CSS bubble, so put the spelling in the label.
+	btn.setAttribute('aria-label', ANSWER_LABEL_SHOWN + (btn.getAttribute('data-answer') || ''));
+}
+
+function hideAnswer(btn) {
+	btn.classList.remove('show-answer');
+	btn.setAttribute('aria-expanded', 'false');
+	btn.setAttribute('aria-label', ANSWER_LABEL_HIDDEN);
+}
+
+function hideAllAnswers() {
+	document.querySelectorAll('.info-btn.show-answer').forEach(hideAnswer);
+}
+
+document.querySelectorAll('.info-btn').forEach(function (btn) {
+	btn.setAttribute('aria-label', ANSWER_LABEL_HIDDEN);
+	btn.setAttribute('aria-expanded', 'false');
+});
+
+document.addEventListener('click', function (event) {
+	var btn = event.target.closest ? event.target.closest('.info-btn') : null;
+	if (!btn) {
+		hideAllAnswers();
+		return;
+	}
+	var wasShown = btn.classList.contains('show-answer');
+	hideAllAnswers();
+	if (!wasShown) showAnswer(btn);
+});
+
+// Hover still works without a click (CSS :hover); this just keeps that
+// bubble on screen too, before it appears.
+document.addEventListener('mouseover', function (event) {
+	var btn = event.target.closest ? event.target.closest('.info-btn') : null;
+	if (btn && !btn.classList.contains('show-answer')) placeAnswerBubble(btn);
+});
+
+document.addEventListener('keydown', function (event) {
+	if (event.key === 'Escape' || event.key === 'Esc') hideAllAnswers();
+});
+
+// Editing an answer makes its bubble stale, so close the one next to it.
+function hideAnswerForField(event) {
+	var field = event.target;
+	if (!field.classList || !(field.classList.contains('answer-input') || field.classList.contains('answer-select'))) return;
+	var btn = field.nextElementSibling; // .info-btn, per the DOM contract in exercise-render-fetch.js
+	if (btn && btn.classList.contains('show-answer')) hideAnswer(btn);
+}
+document.addEventListener('input', hideAnswerForField);
+document.addEventListener('change', hideAnswerForField);
+
+window.addEventListener('resize', function () {
+	document.querySelectorAll('.info-btn.show-answer').forEach(placeAnswerBubble);
 });
 
 (function selfCheck() {
